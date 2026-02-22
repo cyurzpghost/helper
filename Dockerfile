@@ -1,21 +1,34 @@
-FROM n8nio/n8n:latest
+ARG NODE_VERSION=24.13.1
+ARG N8N_VERSION=snapshot
 
-USER root
+FROM n8nio/base:${NODE_VERSION}
 
-# Настроим временную рабочую папку для установки
-WORKDIR /tmp/minio-install
+ARG N8N_VERSION
+ARG N8N_RELEASE_TYPE=dev
+ENV NODE_ENV=production
+ENV N8N_RELEASE_TYPE=${N8N_RELEASE_TYPE}
+ENV SHELL=/bin/sh
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=minio
 
-# Инициализируем package.json в безопасной папке
-RUN npm init -y
-
-# Устанавливаем minio через pnpm локально
-RUN pnpm add minio
-
-# Копируем node_modules напрямую в /usr/local/lib/node_modules
-RUN cp -r node_modules/minio /usr/local/lib/node_modules/
-
-# Настроим Node, чтобы точно видел этот путь
-ENV NODE_PATH=/usr/local/lib/node_modules
-
-USER node
 WORKDIR /home/node
+
+COPY ./compiled /usr/local/lib/node_modules/n8n
+COPY docker/images/n8n/docker-entrypoint.sh /
+
+RUN cd /usr/local/lib/node_modules/n8n && \
+    npm rebuild sqlite3 && \
+    ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n && \
+    npm install minio && \
+    mkdir -p /home/node/.n8n && \
+    chown -R node:node /home/node && \
+    rm -rf /root/.npm /tmp/*
+
+EXPOSE 5678/tcp
+USER node
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+
+LABEL org.opencontainers.image.title="n8n" \
+      org.opencontainers.image.description="Workflow Automation Tool" \
+      org.opencontainers.image.source="https://github.com/n8n-io/n8n" \
+      org.opencontainers.image.url="https://n8n.io" \
+      org.opencontainers.image.version=${N8N_VERSION}
