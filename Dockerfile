@@ -1,5 +1,4 @@
 FROM n8nio/n8n:latest
 USER root
-WORKDIR /usr/local/lib/node_modules/n8n
-RUN npm install minio
+RUN cd /home/node/.n8n && npm init -y && npm install minio
 USER node
