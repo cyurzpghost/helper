@@ -2,17 +2,12 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Устанавливаем модуль
-RUN npm install -g minio
+# Устанавливаем minio прямо в локальную папку n8n
+RUN cd /usr/local/lib/node_modules/n8n && npm install minio
 
-# Настройка путей
-ENV NODE_PATH=/usr/local/lib/node_modules
-
-# РАЗРЕШЕНИЯ:
-# 1. Разрешаем встроенные модули (os, fs и т.д.)
-ENV NODE_FUNCTION_ALLOW_BUILTIN=*
-# 2. Разрешаем minio (старый и новый формат)
-ENV NODE_FUNCTION_ALLOW_EXTERNAL=minio
+# Оставляем переменные для Task Runner (он берет их из окружения)
+ENV NODE_PATH=/usr/local/lib/node_modules/n8n/node_modules:/usr/local/lib/node_modules
 ENV N8N_NODE_FUNCTION_ALLOW_EXTERNAL=minio
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=minio
 
 USER node
