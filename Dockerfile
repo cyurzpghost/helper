@@ -2,12 +2,15 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Настраиваем pnpm global directory
-ENV PNPM_HOME=/usr/local/pnpm
-ENV PATH=$PNPM_HOME:$PATH
+# Устанавливаем minio прямо в node_modules, которые видит Node
+WORKDIR /usr/local/lib/node_modules
 
-RUN mkdir -p $PNPM_HOME \
-    && pnpm config set global-bin-dir $PNPM_HOME \
-    && pnpm add -g minio
+# Инициализируем package.json и ставим minio
+RUN npm init -y \
+    && pnpm add minio
+
+# Обязательно путь в Node
+ENV NODE_PATH=/usr/local/lib/node_modules
 
 USER node
+WORKDIR /home/node
