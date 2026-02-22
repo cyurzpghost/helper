@@ -2,8 +2,9 @@ FROM n8nio/n8n:latest
 
 USER root
 
-WORKDIR /home/node
+RUN npm install minio --prefix /usr/local/lib/node_modules/n8n
 
-RUN npm install minio
+ENV N8N_NODE_FUNCTION_ALLOW_EXTERNAL=true
+ENV N8N_NODE_FUNCTION_ALLOWED_MODULES=minio
 
 USER node
