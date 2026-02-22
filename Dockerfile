@@ -2,7 +2,7 @@ FROM n8nio/n8n:latest
 USER root
 
 # Установка модуля
-RUN npm install minio
+RUN npm install -g minio
 
 # Настройка путей и разрешений (согласно docs.n8n.io)
 ENV NODE_FUNCTION_ALLOW_EXTERNAL=minio
