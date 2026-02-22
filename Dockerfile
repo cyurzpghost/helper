@@ -2,8 +2,7 @@ FROM n8nio/n8n:latest
 
 USER root
 
-WORKDIR /usr/local/lib/node_modules/n8n
-RUN npm install minio
+# Устанавливаем minio глобально через pnpm
+RUN pnpm add -g minio
 
 USER node
-WORKDIR /home/node
