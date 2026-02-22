@@ -1,4 +1,4 @@
 FROM n8nio/n8n:latest
 USER root
-RUN npm install –prefix /usr/local/lib/node_modules/n8n minio
+RUN npm install -g --prefix /usr/local/lib/node_modules/n8n minio
 USER node
