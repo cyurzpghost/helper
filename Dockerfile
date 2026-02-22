@@ -2,14 +2,20 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Переходим в директорию n8n
-WORKDIR /usr/local/lib/node_modules/n8n
+# Настроим временную рабочую папку для установки
+WORKDIR /tmp/minio-install
 
-# Добавляем minio прямо в node_modules n8n через pnpm
+# Инициализируем package.json в безопасной папке
+RUN npm init -y
+
+# Устанавливаем minio через pnpm локально
 RUN pnpm add minio
 
-# Разрешаем Task Runner использовать модуль
-ENV NODE_FUNCTION_ALLOW_EXTERNAL=minio
+# Копируем node_modules напрямую в /usr/local/lib/node_modules
+RUN cp -r node_modules/minio /usr/local/lib/node_modules/
+
+# Настроим Node, чтобы точно видел этот путь
+ENV NODE_PATH=/usr/local/lib/node_modules
 
 USER node
 WORKDIR /home/node
